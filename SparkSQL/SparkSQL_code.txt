@@ -1,0 +1,138 @@
+* spark-shell
+* val mydata = spark.read.csv("health.csv")
+* mydata.show
++--------------------+--------------------+--------------------+
+|                 _c0|                 _c1|                 _c2|
++--------------------+--------------------+--------------------+
+|               Title|              Author|         Description|
+|                [...|Merlo CM, Wuillem...|                I...|
+|Anemia in pregnan...|Williams MD, Wheb...|                B...|
+|                [...|Cases A, Egocheag...|                T...|
+|                [...|Martínez-Vázquez ...|                null|
+|                O...|Adeyemo TA, Adeye...|                M...|
+|                P...|Schümann K, Solom...|                T...|
+|                M...|        Davenport J.|                I...|
+|Anemia of chronic...|Cases A, Egocheag...|                T...|
+|Anemias.         ...|Broadway-Duren JB...|Anemias continue ...|
+|                [...|              Dan K.|                D...|
++--------------------+--------------------+--------------------+
+
+* mydata.printSchema()
+
+root
+ |-- _c0: string (nullable = true)
+ |-- _c1: string (nullable = true)
+ |-- _c2: string (nullable = true)
+
+* mydata.select($"_c0").show()
+
++--------------------+
+|                 _c0|
++--------------------+
+|               Title|
+|                [...|
+|Anemia in pregnan...|
+|                [...|
+|                [...|
+|                O...|
+|                P...|
+|                M...|
+|Anemia of chronic...|
+|Anemias.         ...|
+|                [...|
++--------------------+
+
+* val mydata = spark.read.format("csv").option("InferSchema", "true").option("header", "true").load("health.csv")
+
+mydata: org.apache.spark.sql.DataFrame = [Title: string, Author: string ... 1 more field]
+
+* mydata.printSchema()
+
+root
+ |-- Title: string (nullable = true)
+ |-- Author: string (nullable = true)
+ |-- Description: string (nullable = true)
+
+* mydata.show()
+
++--------------------+--------------------+--------------------+
+|               Title|              Author|         Description|
++--------------------+--------------------+--------------------+
+|                [...|Merlo CM, Wuillem...|                I...|
+|Anemia in pregnan...|Williams MD, Wheb...|                B...|
+|                [...|Cases A, Egocheag...|                T...|
+|                [...|Martínez-Vázquez ...|                null|
+|                O...|Adeyemo TA, Adeye...|                M...|
+|                P...|Schümann K, Solom...|                T...|
+|                M...|        Davenport J.|                I...|
+|Anemia of chronic...|Cases A, Egocheag...|                T...|
+|Anemias.         ...|Broadway-Duren JB...|Anemias continue ...|
+|                [...|              Dan K.|                D...|
++--------------------+--------------------+--------------------+
+
+* mydata.select($"Title", $"Author", $"Description").show()
+
++--------------------+--------------------+--------------------+
+|               Title|              Author|         Description|
++--------------------+--------------------+--------------------+
+|                [...|Merlo CM, Wuillem...|                I...|
+|Anemia in pregnan...|Williams MD, Wheb...|                B...|
+|                [...|Cases A, Egocheag...|                T...|
+|                [...|Martínez-Vázquez ...|                null|
+|                O...|Adeyemo TA, Adeye...|                M...|
+|                P...|Schümann K, Solom...|                T...|
+|                M...|        Davenport J.|                I...|
+|Anemia of chronic...|Cases A, Egocheag...|                T...|
+|Anemias.         ...|Broadway-Duren JB...|Anemias continue ...|
+|                [...|              Dan K.|                D...|
++--------------------+--------------------+--------------------+
+
+* mydata.count.toDouble
+
+res12: Double = 10.0
+
+* mydata.createOrReplaceTempView("health")
+* spark.sql("select * from health").show()
+
++--------------------+--------------------+--------------------+
+|               Title|              Author|         Description|
++--------------------+--------------------+--------------------+
+|                [...|Merlo CM, Wuillem...|                I...|
+|Anemia in pregnan...|Williams MD, Wheb...|                B...|
+|                [...|Cases A, Egocheag...|                T...|
+|                [...|Martínez-Vázquez ...|                null|
+|                O...|Adeyemo TA, Adeye...|                M...|
+|                P...|Schümann K, Solom...|                T...|
+|                M...|        Davenport J.|                I...|
+|Anemia of chronic...|Cases A, Egocheag...|                T...|
+|Anemias.         ...|Broadway-Duren JB...|Anemias continue ...|
+|                [...|              Dan K.|                D...|
++--------------------+--------------------+--------------------+
+
+* val res = spark.sql("select * from health")
+
+res: org.apache.spark.sql.DataFrame = [Title: string, Author: string ... 1 more field]
+
+* res.write.save("mynewdf")
+* spark.read.load("mynewdf/part-00000-7f0e413a-c1de-4850-99c3-f698a16da1b3-c000.snappy.parquet")
+
+res16: org.apache.spark.sql.DataFrame = [Title: string, Author: string ... 1 more field]
+
+* spark.read.load("mynewdf/part-00000-7f0e413a-c1de-4850-99c3-f698a16da1b3-c000.snappy.parquet").show()
+
++--------------------+--------------------+--------------------+
+|               Title|              Author|         Description|
++--------------------+--------------------+--------------------+
+|                [...|Merlo CM, Wuillem...|                I...|
+|Anemia in pregnan...|Williams MD, Wheb...|                B...|
+|                [...|Cases A, Egocheag...|                T...|
+|                [...|Martínez-Vázquez ...|                null|
+|                O...|Adeyemo TA, Adeye...|                M...|
+|                P...|Schümann K, Solom...|                T...|
+|                M...|        Davenport J.|                I...|
+|Anemia of chronic...|Cases A, Egocheag...|                T...|
+|Anemias.         ...|Broadway-Duren JB...|Anemias continue ...|
+|                [...|              Dan K.|                D...|
++--------------------+--------------------+--------------------+
+
+* res.write.format("csv").save("mynewdf1")
